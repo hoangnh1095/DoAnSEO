@@ -37,20 +37,20 @@ from googleapiclient import sample_tools
 
 # Declare command-line flags.
 argparser = argparse.ArgumentParser(add_help=False)
-argparser.add_argument('property_uri', type=str,
+argparser.add_argument('property_uri', type=str,default="unizone.edu.vn",
                        help=('Site or app URI to query data for (including '
                              'trailing slash).'))
-argparser.add_argument('start_date', type=str,
+argparser.add_argument('start_date', type=str,default="2020-09-01",
                        help=('Start date of the requested date range in '
                              'YYYY-MM-DD format.'))
-argparser.add_argument('end_date', type=str,
+argparser.add_argument('end_date', type=str,default="2020-09-30",
                        help=('End date of the requested date range in '
                              'YYYY-MM-DD format.'))
 
-
 def main(argv):
+  #sys.print(sys.argv)
   service, flags = sample_tools.init(
-      argv, 'webmasters', 'v3', __doc__, __file__, parents=[argparser],
+      ['search_analytics_api_sample.py','unizone.edu.vn','2020-09-01','2020-09-30'], 'webmasters', 'v3', __doc__, __file__, parents=[argparser],
       scope='https://www.googleapis.com/auth/webmasters.readonly')
 
   # First run a query to learn which dates we have data for. You should always
