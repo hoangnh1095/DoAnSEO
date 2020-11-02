@@ -34,6 +34,9 @@ from __future__ import print_function
 import argparse
 import sys
 from googleapiclient import sample_tools
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
 
 # Declare command-line flags.
 argparser = argparse.ArgumentParser(add_help=False)
@@ -64,6 +67,7 @@ def main(argv):
   }
   response = execute_request(service, flags.property_uri, request)
   print_table(response, 'Available dates')
+  
 
   # Get totals for the date range.
   request = {
@@ -82,6 +86,7 @@ def main(argv):
   }
   response = execute_request(service, flags.property_uri, request)
   print_table(response, 'Top Queries')
+  
 
   # Get top 11-20 mobile queries for the date range, sorted by click count, descending.
   request = {
@@ -182,8 +187,20 @@ def print_table(response, title):
     # Keys are returned only if one or more dimensions are requested.
     if 'keys' in row:
       keys = u','.join(row['keys']).encode('utf-8').decode()
+      
     print(row_format.format(
         keys, row['clicks'], row['impressions'], row['ctr'], row['position']))
+    plt.plot(keys,row['clicks'],label='Clicks',color='red',marker='.',markersize=10,markeredgecolor='red')
+    plt.plot(keys,row['impressions'],color='blue',marker='.',markersize=10,markeredgecolor='blue')
+    
+    
+  plt.title('Biểu đồ đường')
+  plt.xlabel('Ngày')
+  plt.ylabel('Số lượt')
+  #plt.legend() 
+  plt.show()
+      
+
 
 if __name__ == '__main__':
   main(sys.argv)
