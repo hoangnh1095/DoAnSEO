@@ -7,6 +7,10 @@ import tkinter as tk
 from tkinter import ttk
 from tkinter.messagebox import showinfo
 
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+
 # Declare command-line flags.
 argparser = argparse.ArgumentParser(add_help=False)
 argparser.add_argument('property_uri', type=str,default="unizone.edu.vn",
@@ -47,13 +51,6 @@ def main(argv):
   print_table(response, 'Available dates')
   
 
-  # Get totals for the date range.
-  request = {
-      'startDate': flags.start_date,
-      'endDate': flags.end_date
-  }
-  response = execute_request(service, flags.property_uri, request)
-  print_table(response, 'Totals')
   
 
 
@@ -89,6 +86,11 @@ def print_table(response, title):
   row_format = '{:<20}' + '{:>20}' * 4
   print(row_format.format('Keys', 'Clicks', 'Impressions', 'CTR', 'Position'))
   i=0;
+  key=[]
+  click=[]
+  impression=[]
+  ctr=[]
+  position=[]
   for row in rows:
     keys = ''
     # Keys are returned only if one or more dimensions are requested.
@@ -97,10 +99,24 @@ def print_table(response, title):
       line='Date: '+str(keys)+' '+'Clicks: '+ str(row['clicks'])+' '+'Impressions: '+str(row['impressions'])+' '+'CTR: '+str(row['ctr'])+' '+'Position: '+str(row['position'])
       lb=tk.Label(frame2,text=line)
       lb.grid(row=i,column=1)
+      key.append(keys)
+      click.append(row['clicks'])
+      impression.append(row['impressions'])
+      ctr.append(row['ctr']*1000)
+      position.append(row['position']*1000)
       i+=1
     print(row_format.format(
         keys, row['clicks'], row['impressions'], row['ctr'], row['position']))
-        
+  
+  plt.plot(key,click,label='Clicks',color='red',marker='.',markersize=10,markeredgecolor='red')
+  plt.plot(key,impression,label='Impressions',color='blue',marker='.',markersize=10,markeredgecolor='blue')
+  plt.plot(key,ctr,label='CTR*1000',color='green',marker='.',markersize=10,markeredgecolor='green')
+  plt.plot(key,position,label='Position*1000',color='yellow',marker='.',markersize=10,markeredgecolor='yellow')
+  plt.title('Biểu đồ đường')
+  plt.xlabel('Ngày')
+  plt.ylabel('Số lượt')
+  plt.legend() 
+  plt.show()
     
     
         
