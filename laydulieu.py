@@ -28,7 +28,7 @@ argparser.add_argument('end_date', type=str,default="2020-09-30",
 
   
 
-def getData(ngaybatdau,ngayketthuc,url):
+def getBdduong(ngaybatdau,ngayketthuc,url):
     #sys.print(sys.argv)
     
   service, flags = sample_tools.init(
@@ -42,23 +42,25 @@ def getData(ngaybatdau,ngayketthuc,url):
       'dimensions': ['date']
   }
 
-  requestPage = {
-      'startDate': ngaybatdau,
-      'endDate': ngayketthuc,
-      'dimensions': ['page'],
-      'rowLimit': 10
-  }
+ 
+  response = execute_request(service, url, request)
+  print_table(response,frame)
+  
+  
+def getBdcot(ngaybatdau,ngayketthuc,url):
+    #sys.print(sys.argv)
+    
+  service, flags = sample_tools.init(
+      ['search_analytics_api_sample.py','unizone.edu.vn','2020-09-01','2020-09-30'], 'webmasters', 'v3', __doc__, __file__, parents=[argparser],
+      scope='https://www.googleapis.com/auth/webmasters.readonly')
 
   request2 = {
       'startDate': ngaybatdau,
       'endDate': ngayketthuc,
       
-  }
-  response = execute_request(service, url, requestPage)
+  } 
   response2 = execute_request(service, url, request2)
-  print_table(response,'Available dates',frame)
-  print_table2(response2,'Available dates')
-  
+  print_table2(response2) 
 
 
 
@@ -74,23 +76,20 @@ def execute_request(service, property_uri, request):
   return service.searchanalytics().query(
       siteUrl=property_uri, body=request).execute()
 
-def print_table2(response,title):
+def print_table2(response):
   """Prints out a response table.
   Each row contains key(s), clicks, impressions, CTR, and average position.
   Args:
     response: The server response to be printed as a table.
     title: The title of the table.
   """
-  print('\n --' + title + ':')
   
   if 'rows' not in response:
     print('Empty response')
     return
 
   rows = response['rows']
-  row_format = '{:<20}' + '{:>20}' * 4
-  print(row_format.format('Keys', 'Clicks', 'Impressions', 'CTR', 'Position'))
-  
+  row_format = '{:<20}' + '{:>20}' * 4  
   i=0;
   key=[]
   click=[]
@@ -107,29 +106,27 @@ def print_table2(response,title):
       impression.append(row['impressions'])
       ctr.append(row['ctr'])
       position.append(row['position'])
-  label=['Clicks','Impression','CTR*1000','Position*100']
-  value=[row['clicks'],row['impressions'],row['ctr']*1000,row['position']*100]
+  label=['Clicks','Impression','CTR*10000','Position*100']
+  value=[row['clicks'],row['impressions'],row['ctr']*10000,row['position']*100]
   plt.bar(label,value)
   plt.title('Biểu đồ cột')
   plt.show()
 
 
-def print_table(response,title,frame):
+def print_table(response,frame):
   """Prints out a response table.
   Each row contains key(s), clicks, impressions, CTR, and average position.
   Args:
     response: The server response to be printed as a table.
     title: The title of the table.
   """
-  print('\n --' + title + ':')
-  
   if 'rows' not in response:
     print('Empty response')
     return
 
   rows = response['rows']
   row_format = '{:<20}' + '{:>20}' * 4
-  print(row_format.format('Keys', 'Clicks', 'Impressions', 'CTR', 'Position'))
+  """print(row_format.format('Keys', 'Clicks', 'Impressions', 'CTR', 'Position'))"""
   
   i=0;
   key=[]
@@ -151,9 +148,6 @@ def print_table(response,title,frame):
       ctr.append(row['ctr']*1000)
       position.append(row['position']*1000)
       i+=1
-    print(row_format.format(
-        keys, row['clicks'], row['impressions'], row['ctr'], row['position']))
-  
   plt.plot(key,click,label='Clicks',color='red',marker='.',markersize=10,markeredgecolor='red')
   plt.plot(key,impression,label='Impressions',color='blue',marker='.',markersize=10,markeredgecolor='blue')
   plt.plot(key,ctr,label='CTR*1000',color='green',marker='.',markersize=10,markeredgecolor='green')
@@ -163,6 +157,7 @@ def print_table(response,title,frame):
   plt.ylabel('Số lượt') 
   plt.legend() 
   plt.show()
+
 
 
     
