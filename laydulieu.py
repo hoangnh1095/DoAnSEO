@@ -41,15 +41,23 @@ def getData(ngaybatdau,ngayketthuc,url):
       'endDate': ngayketthuc,
       'dimensions': ['date']
   }
+
+  requestPage = {
+      'startDate': ngaybatdau,
+      'endDate': ngayketthuc,
+      'dimensions': ['page'],
+      'rowLimit': 10
+  }
+
   request2 = {
       'startDate': ngaybatdau,
       'endDate': ngayketthuc,
       
   }
-  response = execute_request(service, url, request)
+  response = execute_request(service, url, requestPage)
   response2 = execute_request(service, url, request2)
   print_table(response,'Available dates',frame)
-  print_table2(response,'Available dates')
+  print_table2(response2,'Available dates')
   
 
 
@@ -156,5 +164,5 @@ def print_table(response,title,frame):
   plt.legend() 
   plt.show()
 
-getData('2020-09-01','2020-09-30','unizone.edu.vn')
+
     
