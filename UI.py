@@ -16,7 +16,15 @@ WIDTH=600
 #function
 def popup_showinfo():
     showinfo("Loading", "Đang tải dữ liệu về...")
-    
+
+def createNewFrame():
+    showinfo("Trạng thái","Thành công !!! ")
+    window = tk.Tk()
+    window.title("Phần mềm phân tích trang web")
+    window.geometry("+700+100")
+    canvas=tk.Canvas(window,height=500,width=WIDTH,bg="white")
+    canvas.pack()
+    getData.getBdduong(dateStartTextField.get("1.0",tk.END+"-1c"),dateEndTextField.get("1.0",tk.END+"-1c"),"unizone.edu.vn")
 def getDate(num):
     def print_sel():
         if(num==1):
@@ -68,7 +76,7 @@ dateEndTextField.configure(state='disable')
 dateEndTextField.grid(row=4,column=1)
 buttonGetDate=tk.Button(frame, text='Chọn ngày kết thúc', command=lambda:getDate(2))
 buttonGetDate.grid(row=5,column=1)
-buttonGetData=tk.Button(frame,text="Bắt đầu",bg="blue",command=lambda: getData.getData(dateStartTextField.get("1.0",tk.END+"-1c"),dateEndTextField.get("1.0",tk.END+"-1c"),"unizone.edu.vn"))
+buttonGetData=tk.Button(frame,text="Bắt đầu",bg="blue",command=lambda:createNewFrame())
 buttonGetData.grid(row=6,column=1)
 
 window.mainloop()
