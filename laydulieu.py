@@ -28,7 +28,7 @@ argparser.add_argument('end_date', type=str,default="2020-09-30",
 
   
 
-def getBdduong(ngaybatdau,ngayketthuc,url):
+def getNgay(ngaybatdau,ngayketthuc,url):
     #sys.print(sys.argv)
     
   service, flags = sample_tools.init(
@@ -44,10 +44,10 @@ def getBdduong(ngaybatdau,ngayketthuc,url):
 
  
   response = execute_request(service, url, request)
-  print_table(response,frame)
+  print_table(response)
   
   
-def getBdcot(ngaybatdau,ngayketthuc,url):
+def getTong(ngaybatdau,ngayketthuc,url):
     #sys.print(sys.argv)
     
   service, flags = sample_tools.init(
@@ -62,6 +62,45 @@ def getBdcot(ngaybatdau,ngayketthuc,url):
   response2 = execute_request(service, url, request2)
   print_table2(response2) 
 
+def getTrang(ngaybatdau,ngayketthuc,url):
+  service, flags = sample_tools.init(
+      ['search_analytics_api_sample.py','unizone.edu.vn','2020-09-01','2020-09-30'], 'webmasters', 'v3', __doc__, __file__, parents=[argparser],
+      scope='https://www.googleapis.com/auth/webmasters.readonly')
+
+  request = {
+      'startDate': flags.start_date,
+      'endDate': flags.end_date,
+      'dimensions': ['page'],
+      'rowLimit': 5
+  }
+  response = execute_request(service, url, request)
+  print_table5(response)
+def getCountry(ngaybatdau,ngayketthuc,url):
+  service, flags = sample_tools.init(
+      ['search_analytics_api_sample.py','unizone.edu.vn','2020-09-01','2020-09-30'], 'webmasters', 'v3', __doc__, __file__, parents=[argparser],
+      scope='https://www.googleapis.com/auth/webmasters.readonly')
+
+  request = {
+      'startDate': flags.start_date,
+      'endDate': flags.end_date,
+      'dimensions': ['country'],
+      'rowLimit': 10
+  }
+  response = execute_request(service, url, request)
+  print_table4(response)
+def getDevice(ngaybatdau,ngayketthuc,url):
+  service, flags = sample_tools.init(
+      ['search_analytics_api_sample.py','unizone.edu.vn','2020-09-01','2020-09-30'], 'webmasters', 'v3', __doc__, __file__, parents=[argparser],
+      scope='https://www.googleapis.com/auth/webmasters.readonly')
+
+  request = {
+      'startDate': flags.start_date,
+      'endDate': flags.end_date,
+      'dimensions': ['device'],
+      'rowLimit': 10
+  }
+  response = execute_request(service, url, request)
+  print_table5(response)
 
 
 def execute_request(service, property_uri, request):
@@ -110,10 +149,12 @@ def print_table2(response):
   value=[row['clicks'],row['impressions'],row['ctr']*10000,row['position']*100]
   plt.bar(label,value)
   plt.title('Biểu đồ cột')
+  thismanager= plt.get_current_fig_manager()
+  thismanager.window.wm_geometry("+50+100")
   plt.show()
 
 
-def print_table(response,frame):
+def print_table(response):
   """Prints out a response table.
   Each row contains key(s), clicks, impressions, CTR, and average position.
   Args:
@@ -155,9 +196,172 @@ def print_table(response,frame):
   plt.title('Biểu đồ đường')
   plt.xlabel('Ngày')
   plt.ylabel('Số lượt') 
-  plt.legend() 
+  plt.legend()
+  thismanager= plt.get_current_fig_manager()
+  thismanager.window.wm_geometry("+50+100")
   plt.show()
+def print_table3(response):
+  """Prints out a response table.
+  Each row contains key(s), clicks, impressions, CTR, and average position.
+  Args:
+    response: The server response to be printed as a table.
+    title: The title of the table.
+  """
+ 
+  
+  if 'rows' not in response:
+    print('Empty response')
+    return
 
+  rows = response['rows']
+  row_format = '{:<20}' + '{:>20}' * 4
+  print(row_format.format('Keys', 'Clicks', 'Impressions', 'CTR', 'Position'))
+  for row in rows:
+    keys = ''
+    # Keys are returned only if one or more dimensions are requested.
+    if 'keys' in row:
+      keys = u','.join(row['keys']).encode('utf-8').decode()
+      
+    print(row_format.format(
+        keys, row['clicks'], row['impressions'], row['ctr'], row['position']))
+def print_table4(response):
+  """Prints out a response table.
+  Each row contains key(s), clicks, impressions, CTR, and average position.
+  Args:
+    response: The server response to be printed as a table.
+    title: The title of the table.
+  """
+  if 'rows' not in response:
+    print('Empty response')
+    return
+
+  rows = response['rows']
+  row_format = '{:<20}' + '{:>20}' * 4
+  """print(row_format.format('Keys', 'Clicks', 'Impressions', 'CTR', 'Position'))"""
+  
+  i=0;
+  key=[]
+  click=[]
+  impression=[]
+  ctr=[]
+  position=[]
+  for row in rows:
+    keys = ''
+    # Keys are returned only if one or more dimensions are requested.
+    if 'keys' in row:
+      keys = u','.join(row['keys']).encode('utf-8').decode()
+      line='Date: '+str(keys)+' '+'Clicks: '+ str(row['clicks'])+' '+'Impressions: '+str(row['impressions'])+' '+'CTR: '+str(row['ctr'])+' '+'Position: '+str(row['position'])
+      '''lb=tk.Label(frame2,text=line)
+      lb.grid(row=i,column=1)'''
+      key.append(keys)
+      click.append(row['clicks'])
+      impression.append(row['impressions'])
+      ctr.append(row['ctr']*1000)
+      position.append(row['position']*1000)
+      i+=1
+  plt.plot(key,click,label='Clicks',color='red',marker='.',markersize=10,markeredgecolor='red')
+  plt.plot(key,impression,label='Impressions',color='blue',marker='.',markersize=10,markeredgecolor='blue')
+  plt.plot(key,ctr,label='CTR*1000',color='green',marker='.',markersize=10,markeredgecolor='green')
+  plt.plot(key,position,label='Position*1000',color='yellow',marker='.',markersize=10,markeredgecolor='yellow')
+  plt.title('Biểu đồ đường')
+  plt.xlabel('Quốc gia')
+  plt.ylabel('Số lượt') 
+  plt.legend()
+  thismanager= plt.get_current_fig_manager()
+  thismanager.window.wm_geometry("+50+100")
+  plt.show()
+def print_table5(response):
+  """Prints out a response table.
+  Each row contains key(s), clicks, impressions, CTR, and average position.
+  Args:
+    response: The server response to be printed as a table.
+    title: The title of the table.
+  """
+  if 'rows' not in response:
+    print('Empty response')
+    return
+
+  rows = response['rows']
+  row_format = '{:<20}' + '{:>20}' * 4
+  """print(row_format.format('Keys', 'Clicks', 'Impressions', 'CTR', 'Position'))"""
+  
+  i=0;
+  key=[]
+  click=[]
+  impression=[]
+  ctr=[]
+  position=[]
+  for row in rows:
+    keys = ''
+    # Keys are returned only if one or more dimensions are requested.
+    if 'keys' in row:
+      keys = u','.join(row['keys']).encode('utf-8').decode()
+      line='Date: '+str(keys)+' '+'Clicks: '+ str(row['clicks'])+' '+'Impressions: '+str(row['impressions'])+' '+'CTR: '+str(row['ctr'])+' '+'Position: '+str(row['position'])
+      '''lb=tk.Label(frame2,text=line)
+      lb.grid(row=i,column=1)'''
+      key.append(keys)
+      click.append(row['clicks'])
+      impression.append(row['impressions'])
+      ctr.append(row['ctr']*1000)
+      position.append(row['position']*1000)
+      i+=1
+  plt.plot(key,click,label='Clicks',color='red',marker='.',markersize=10,markeredgecolor='red')
+  plt.plot(key,impression,label='Impressions',color='blue',marker='.',markersize=10,markeredgecolor='blue')
+  plt.plot(key,ctr,label='CTR*1000',color='green',marker='.',markersize=10,markeredgecolor='green')
+  plt.plot(key,position,label='Position*1000',color='yellow',marker='.',markersize=10,markeredgecolor='yellow')
+  plt.title('Biểu đồ đường')
+  plt.xlabel('Thiết bị')
+  plt.ylabel('Số lượt') 
+  plt.legend()
+  thismanager= plt.get_current_fig_manager()
+  thismanager.window.wm_geometry("+50+100")
+  plt.show()
+def print_table5(response):
+  """Prints out a response table.
+  Each row contains key(s), clicks, impressions, CTR, and average position.
+  Args:
+    response: The server response to be printed as a table.
+    title: The title of the table.
+  """
+  if 'rows' not in response:
+    print('Empty response')
+    return
+
+  rows = response['rows']
+  row_format = '{:<20}' + '{:>20}' * 4
+  """print(row_format.format('Keys', 'Clicks', 'Impressions', 'CTR', 'Position'))"""
+  
+  i=0;
+  key=[]
+  click=[]
+  impression=[]
+  ctr=[]
+  position=[]
+  for row in rows:
+    keys = ''
+    # Keys are returned only if one or more dimensions are requested.
+    if 'keys' in row:
+      keys = u','.join(row['keys']).encode('utf-8').decode()
+      line='Date: '+str(keys)+' '+'Clicks: '+ str(row['clicks'])+' '+'Impressions: '+str(row['impressions'])+' '+'CTR: '+str(row['ctr'])+' '+'Position: '+str(row['position'])
+      '''lb=tk.Label(frame2,text=line)
+      lb.grid(row=i,column=1)'''
+      key.append(keys)
+      click.append(row['clicks'])
+      impression.append(row['impressions'])
+      ctr.append(row['ctr']*1000)
+      position.append(row['position']*1000)
+      i+=1
+  plt.plot(key,click,label='Clicks',color='red',marker='.',markersize=10,markeredgecolor='red')
+  plt.plot(key,impression,label='Impressions',color='blue',marker='.',markersize=10,markeredgecolor='blue')
+  plt.plot(key,ctr,label='CTR*1000',color='green',marker='.',markersize=10,markeredgecolor='green')
+  plt.plot(key,position,label='Position*1000',color='yellow',marker='.',markersize=10,markeredgecolor='yellow')
+  plt.title('Biểu đồ đường')
+  plt.xlabel('Trang')
+  plt.ylabel('Số lượt') 
+  plt.legend()
+  thismanager= plt.get_current_fig_manager()
+  thismanager.window.wm_geometry("+50+100")
+  plt.show()
 
 
     
